@@ -31,6 +31,9 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
             </b>{" "}
             this week
           </span>
+          <Link href="/settings" className="ch-av ch-av--lg" style={{ background: "var(--surface-quiet)", textDecoration: "none", marginLeft: 0, width: "var(--size-tap)", height: "var(--size-tap)", color: "var(--ink)" }} aria-label="Settings and profile">
+            {(profile.displayName.trim()[0] ?? "?").toUpperCase()}
+          </Link>
         </div>
       </header>
 

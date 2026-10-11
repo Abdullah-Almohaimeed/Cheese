@@ -54,6 +54,45 @@ for (const scheme of ["light", "dark"] as const) {
       await page.goto(`/plan/book?day=${day}&start=19:00&gap=90`);
       await shot(page, "plan-book", scheme);
 
+      // Friends: a group of five who share some things.
+      const { makeUser } = await import("../helpers");
+      const { createGroup, respondToRequest, sendFriendRequest } = await import("@/lib/friends");
+      const { addEntry, upsertItem } = await import("@/lib/library");
+      const { entry } = await import("@/db/schema");
+      const { eq } = await import("drizzle-orm");
+      const friends = [] as { id: string; name: string; profile: { username: string } }[];
+      for (const n of ["Sara", "Omar", "Lina", "Khalid"]) {
+        const u = await makeUser(n);
+        await sendFriendRequest(me, u.profile.username);
+        await respondToRequest(u.id, me, true);
+        friends.push(u);
+      }
+      await seedDemo(friends[0].id);
+      await seedDemo(friends[1].id);
+      for (const u of friends.slice(2)) {
+        for (const ext of ["movie/157336", "movie/976893"]) {
+          const it = (await db.query.item.findFirst({ where: (t, { eq: e }) => e(t.externalId, ext) }))!;
+          const { entry: en } = await addEntry(u.id, it.id);
+          await db.update(entry).set({ together: true }).where(eq(entry.id, en.id));
+        }
+      }
+      await upsertItem; // keep the import used
+      const g = await createGroup(me, "Movie nights", friends.map((f) => f.id));
+      if (!g.ok) throw new Error(g.error);
+      await page.goto(`/friends?group=${g.id}`);
+      await shot(page, "friends", scheme);
+      await page.goto("/friends/people");
+      await shot(page, "friends-people", scheme);
+      await page.goto("/friends/add");
+      await shot(page, "friends-add", scheme);
+      await page.goto(`/friends/u/${friends[0].profile.username}`);
+      await shot(page, "friend-profile", scheme, true);
+      const prophecy = (await db.query.item.findFirst({ where: (t, { eq: e }) => e(t.externalId, "tv/157741") }))!;
+      await page.goto(`/friends/item/${prophecy.id}?group=${g.id}`);
+      await shot(page, "friend-item", scheme);
+      await page.goto("/settings");
+      await shot(page, "settings", scheme);
+
       await page.goto("/library");
       await shot(page, "library", scheme);
       await page.goto("/library?status=in_progress");
