@@ -1,5 +1,7 @@
 # Cheese: Product Spec
 
+Build status: see [STATUS.md](STATUS.md).
+
 Cheese is a phone-first web app for tracking the movies, series, anime, manga, books and games you want to get to, making real time for them, and finding the ones you can do with friends.
 
 Status: planning complete, not built yet.

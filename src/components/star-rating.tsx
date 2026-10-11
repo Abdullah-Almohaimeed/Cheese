@@ -29,11 +29,11 @@ export function StarRating({
       className={`ch-stars${large ? " ch-stars--lg" : ""}`}
       role={interactive ? "slider" : "img"}
       tabIndex={interactive ? 0 : undefined}
-      aria-label={label}
+      aria-label={interactive ? label : `${label}: ${stars ? `${stars} out of 5` : "not rated"}`}
       aria-valuemin={interactive ? 0 : undefined}
       aria-valuemax={interactive ? 5 : undefined}
       aria-valuenow={interactive ? stars : undefined}
-      aria-valuetext={stars ? `${stars} out of 5` : "Not rated"}
+      aria-valuetext={interactive ? (stars ? `${stars} out of 5` : "Not rated") : undefined}
       onKeyDown={(e) => {
         if (!interactive) return;
         if (e.key === "ArrowRight" || e.key === "ArrowUp") {

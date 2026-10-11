@@ -27,6 +27,7 @@ export type ItemState = {
   title: string;
   /** Show the "how was it" prompt first, because the item was just finished. */
   justFinished: boolean;
+  togetherHint: string;
 };
 
 function useAction() {
@@ -146,7 +147,7 @@ export function ItemControls({ initial }: { initial: ItemState }) {
           <div className="ch-setting">
             <div>
               <p className="ch-setting__label">Together?</p>
-              <p className="ch-setting__hint">Open to doing this with friends</p>
+              <p className="ch-setting__hint">{s.togetherHint}</p>
             </div>
             <button className="ch-switch" role="switch" aria-checked={s.together} aria-label="Together" onClick={() => save({ together: !s.together }, { together: !s.together })} />
           </div>

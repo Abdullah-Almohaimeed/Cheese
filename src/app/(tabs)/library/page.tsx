@@ -7,6 +7,7 @@ import { percent, shortProgress } from "@/lib/progress";
 import { CATEGORY_LABEL, CATEGORY_PLURAL } from "@/lib/length";
 import { libraryGenres, listLibrary, parseFilter, SORT_LABEL, SORTS, statusCounts, type LibraryFilter } from "@/lib/library-query";
 import { requireUser } from "@/lib/session";
+import { shortDate } from "@/lib/time";
 
 export const metadata = { title: "Library" };
 
@@ -28,7 +29,7 @@ function href(f: LibraryFilter, over: Partial<Record<keyof LibraryFilter | "prio
 }
 
 export default async function LibraryPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  const { user } = await requireUser();
+  const { user, profile } = await requireUser();
   const sp = await searchParams;
   const f = parseFilter(sp);
   const showSearch = sp.search === "1" || Boolean(f.q);
@@ -141,7 +142,12 @@ export default async function LibraryPage({ searchParams }: { searchParams: Prom
               const total = e.totalOverride ?? it.totalUnits;
               const pct = percent(e.progress, total);
               const showBar = (e.status === "in_progress" || e.status === "paused") && pct != null;
-              const prog = e.progress > 0 && it.unit !== "watch" ? ` · ${shortProgress(it.unit, e.progress)}` : "";
+              const prog =
+                e.status === "done" && e.finishedAt
+                  ? ` · ${shortDate(e.finishedAt, profile.timezone)}`
+                  : e.progress > 0 && it.unit !== "watch"
+                    ? ` · ${shortProgress(it.unit, e.progress)}`
+                    : "";
               return (
                 <Link key={e.id} href={`/item/${e.id}`} className="ch-tile" style={{ textDecoration: "none" }}>
                   <Cover src={it.coverUrl} title={it.title} />

@@ -43,3 +43,10 @@ export function relativeDay(d: Date, now: Date, zone: string): string {
   if (diff === 1) return "Tomorrow";
   return dayLabel(d, zone);
 }
+
+/** "12 Oct", or "12 Oct 2025" when it is not this year. */
+export function shortDate(d: Date, zone: string, now = new Date()): string {
+  const local = DateTime.fromJSDate(d, { zone });
+  const sameYear = local.year === DateTime.fromJSDate(now, { zone }).year;
+  return local.toFormat(sameYear ? "d LLL" : "d LLL yyyy");
+}

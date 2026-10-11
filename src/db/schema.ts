@@ -57,12 +57,17 @@ export const profile = pgTable(
     displayName: text("display_name").notNull(),
     avatarTone: smallint("avatar_tone").notNull().default(1),
     weeklyGoalMinutes: integer("weekly_goal_minutes").notNull().default(360),
+    // How long before a session a reminder is sent. 0 turns reminders off.
+    reminderLeadMin: smallint("reminder_lead_min").notNull().default(30),
     timezone: text("timezone").notNull().default("UTC"),
     icsToken: text("ics_token").notNull().unique(),
     inviteCode: text("invite_code").notNull().unique(),
     createdAt: tz("created_at").notNull().defaultNow(),
   },
-  (t) => [check("profile_avatar_tone", sql`${t.avatarTone} between 1 and 4`)],
+  (t) => [
+    check("profile_avatar_tone", sql`${t.avatarTone} between 1 and 4`),
+    check("profile_reminder_lead", sql`${t.reminderLeadMin} in (0, 15, 30, 60)`),
+  ],
 );
 
 /* ---------- Catalog ---------- */

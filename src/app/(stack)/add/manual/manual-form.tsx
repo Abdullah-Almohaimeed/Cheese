@@ -38,7 +38,6 @@ export function ManualForm() {
               aria-checked={category === c}
               key={c}
               className="ch-chip"
-              aria-pressed={category === c}
               onClick={() => setCategory(c)}
             >
               {CATEGORY_LABEL[c]}

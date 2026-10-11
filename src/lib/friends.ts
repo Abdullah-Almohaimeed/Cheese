@@ -264,3 +264,32 @@ export async function friendLibrary(viewerId: string, friendId: string) {
     .orderBy(sql`${entry.updatedAt} desc`);
   return { person, rows };
 }
+
+/** Names of friends who are open to doing this item together. Hidden entries never count. */
+export async function friendsWanting(userId: string, itemId: string): Promise<string[]> {
+  const friends = await listFriends(userId);
+  if (!friends.length) return [];
+  const rows = await db
+    .select({ userId: entry.userId })
+    .from(entry)
+    .where(
+      and(
+        inArray(entry.userId, friends.map((f) => f.userId)),
+        eq(entry.itemId, itemId),
+        eq(entry.together, true),
+        eq(entry.hidden, false),
+        sql`(${entry.status} in ('want', 'in_progress', 'paused') or (${entry.status} = 'done' and ${entry.wouldRedo}))`,
+      ),
+    );
+  const ids = new Set(rows.map((r) => r.userId));
+  return friends.filter((f) => ids.has(f.userId)).map((f) => f.displayName);
+}
+
+/** "Sara wants this too", "Sara and Omar want this", "Sara, Omar and 2 more want this". */
+export function wantingHint(names: string[]): string {
+  if (names.length === 0) return "Open to doing this with friends";
+  if (names.length === 1) return `${names[0]} wants this too`;
+  if (names.length === 2) return `${names[0]} and ${names[1]} want this`;
+  if (names.length === 3) return `${names[0]}, ${names[1]} and ${names[2]} want this`;
+  return `${names[0]}, ${names[1]} and ${names.length - 2} more want this`;
+}

@@ -88,3 +88,9 @@ input:focus-visible + .adjust-opt { outline: 2px solid var(--focus); outline-off
 .window-row .input { min-height: 44px; min-width: 0; flex: 1; padding-inline: var(--space-2); font-size: 15px; }
 .window-row .iconbtn { flex: none; width: 40px; height: 40px; border: 0; font-size: 20px; line-height: 1; cursor: pointer; }
 .window-row > span { flex: none; }
+
+/* Radio-style chips use aria-checked; the week strip uses links, so "selected" is aria-current="page" and today is data-today */
+.ch-chip[aria-checked="true"] { background: var(--ink); color: var(--bg); }
+.ch-day[aria-current="page"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.ch-day[aria-current="page"] b { color: var(--bg); }
+.ch-day[data-today="true"]:not([aria-current="page"]) { border-color: var(--border-control); }

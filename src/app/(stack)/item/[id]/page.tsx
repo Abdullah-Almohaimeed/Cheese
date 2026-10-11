@@ -6,7 +6,9 @@ import { Cover } from "@/components/cover";
 import { Icon } from "@/components/icons";
 import { getOwnEntry } from "@/lib/entries";
 import { CATEGORY_LABEL, formatMinutes, totalMinutes } from "@/lib/length";
+import { friendsWanting, wantingHint } from "@/lib/friends";
 import { requireUser } from "@/lib/session";
+import { shortDate } from "@/lib/time";
 import { ItemControls, RemoveButton, type ItemState } from "./item-controls";
 
 export const metadata = { title: "Item" };
@@ -32,13 +34,14 @@ function lengthLine(it: { unit: string; totalUnits: number | null; unitSeconds: 
 }
 
 export default async function ItemPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ rate?: string }> }) {
-  const { user } = await requireUser();
+  const { user, profile } = await requireUser();
   const { id } = await params;
   if (!z.uuid().safeParse(id).success) notFound();
   const row = await getOwnEntry(user.id, id);
   if (!row) notFound();
   const { entry: e, item: it } = row;
   const { rate } = await searchParams;
+  const togetherHint = wantingHint(await friendsWanting(user.id, it.id));
 
   const state: ItemState = {
     entryId: e.id,
@@ -57,6 +60,7 @@ export default async function ItemPage({ params, searchParams }: { params: Promi
     sized: { unit: it.unit, totalUnits: it.totalUnits, unitSeconds: it.unitSeconds },
     title: it.title,
     justFinished: rate === "1",
+    togetherHint,
   };
   const length = lengthLine(it, e.totalOverride);
   const sub = [it.year, it.creator].filter(Boolean).join(" · ");
@@ -85,6 +89,7 @@ export default async function ItemPage({ params, searchParams }: { params: Promi
           <div className="row">
             <StatusBadge status={e.status} />
           </div>
+          {e.status === "done" && e.finishedAt && <span className="ch-caption">Finished {shortDate(e.finishedAt, profile.timezone)}</span>}
         </div>
       </section>
 

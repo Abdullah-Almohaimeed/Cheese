@@ -41,10 +41,10 @@ export default async function PlanPage({ searchParams }: { searchParams: Promise
             key={day}
             href={`/plan?day=${day}`}
             className={`ch-day${hasPlan ? " has-plan" : ""}`}
-            aria-current={day === plan.today ? "date" : undefined}
-            aria-pressed={day === plan.selected}
+            aria-current={day === plan.selected ? "page" : undefined}
+            data-today={day === plan.today ? "true" : undefined}
             style={{ textDecoration: "none" }}
-            aria-label={dayLabel(asDate(day), zone)}
+            aria-label={`${dayLabel(asDate(day), zone)}${day === plan.today ? ", today" : ""}`}
           >
             {letters[i]}
             <b>{Number(day.slice(8))}</b>

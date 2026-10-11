@@ -3,6 +3,7 @@ import { saveProfile } from "@/app/actions/friends";
 import { ActionForm } from "@/components/form-field";
 import { Icon } from "@/components/icons";
 import { requireUser } from "@/lib/session";
+import { ReminderSettings } from "./reminder-settings";
 import { SignOutButton } from "./sign-out";
 
 export const metadata = { title: "Settings" };
@@ -32,6 +33,11 @@ export default async function SettingsPage() {
           </div>
         </ActionForm>
         <p className="hint">Signed in as {user.email}</p>
+      </section>
+
+      <section className="sec">
+        <p className="ch-overline">Reminders</p>
+        <ReminderSettings vapidKey={process.env.VAPID_PUBLIC_KEY ?? null} lead={profile.reminderLeadMin} />
       </section>
 
       <section className="sec">

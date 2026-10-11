@@ -1,5 +1,5 @@
 {
-  "id": "3918ab96-fd6c-434a-8be9-38da1fa68c49",
+  "id": "d411d985-aba8-411b-8866-1ef2215606ad",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -1446,6 +1446,13 @@
           "notNull": true,
           "default": 360
         },
+        "reminder_lead_min": {
+          "name": "reminder_lead_min",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 30
+        },
         "timezone": {
           "name": "timezone",
           "type": "text",
@@ -1518,6 +1525,10 @@
         "profile_avatar_tone": {
           "name": "profile_avatar_tone",
           "value": "\"profile\".\"avatar_tone\" between 1 and 4"
+        },
+        "profile_reminder_lead": {
+          "name": "profile_reminder_lead",
+          "value": "\"profile\".\"reminder_lead_min\" in (0, 15, 30, 60)"
         }
       },
       "isRLSEnabled": false

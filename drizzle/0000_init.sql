@@ -155,6 +155,7 @@ CREATE TABLE "profile" (
 	"display_name" text NOT NULL,
 	"avatar_tone" smallint DEFAULT 1 NOT NULL,
 	"weekly_goal_minutes" integer DEFAULT 360 NOT NULL,
+	"reminder_lead_min" smallint DEFAULT 30 NOT NULL,
 	"timezone" text DEFAULT 'UTC' NOT NULL,
 	"ics_token" text NOT NULL,
 	"invite_code" text NOT NULL,
@@ -162,7 +163,8 @@ CREATE TABLE "profile" (
 	CONSTRAINT "profile_username_unique" UNIQUE("username"),
 	CONSTRAINT "profile_ics_token_unique" UNIQUE("ics_token"),
 	CONSTRAINT "profile_invite_code_unique" UNIQUE("invite_code"),
-	CONSTRAINT "profile_avatar_tone" CHECK ("profile"."avatar_tone" between 1 and 4)
+	CONSTRAINT "profile_avatar_tone" CHECK ("profile"."avatar_tone" between 1 and 4),
+	CONSTRAINT "profile_reminder_lead" CHECK ("profile"."reminder_lead_min" in (0, 15, 30, 60))
 );
 --> statement-breakpoint
 CREATE TABLE "progress_log" (

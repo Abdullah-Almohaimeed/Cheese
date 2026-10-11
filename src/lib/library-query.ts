@@ -50,6 +50,9 @@ export async function listLibrary(userId: string, f: LibraryFilter): Promise<Lib
   );
   const rows = await db.select({ entry, item }).from(entry).innerJoin(item, eq(entry.itemId, item.id)).where(where).orderBy(desc(entry.updatedAt));
   const len = (r: LibraryRow) => totalMinutes(r.item, r.entry.totalOverride) ?? Number.MAX_SAFE_INTEGER;
+  if (f.status === "done" && f.sort === "recent") {
+    return rows.sort((a, b) => (b.entry.finishedAt?.getTime() ?? 0) - (a.entry.finishedAt?.getTime() ?? 0));
+  }
   switch (f.sort) {
     case "priority":
       return rows.sort((a, b) => Number(b.entry.priority === "must") - Number(a.entry.priority === "must"));

@@ -336,3 +336,27 @@ describe("the group's common list", () => {
     expect((await loadGroupView(a.id, groupId))!.match).toBeNull();
   });
 });
+
+describe("friend hints", () => {
+  it("names the friends who also want an item, and nobody else", async () => {
+    const { friendsWanting, wantingHint } = await import("@/lib/friends");
+    const a = await makeUser("Yousef");
+    const b = await makeUser("Sara");
+    const c = await makeUser("Omar");
+    const d = await makeUser("Dana");
+    await befriend(a, b);
+    await befriend(a, c); // Dana is not a friend
+    const film = await upsertItem({ category: "movie", source: "tmdb", externalId: "m/1", title: "Film", creator: null, year: null, coverUrl: null, summary: null, unit: "watch", totalUnits: 1, unitSeconds: 6000, genres: [], platforms: [] });
+    for (const [u, patch] of [[b, {}], [c, { hidden: true }], [d, {}]] as const) {
+      const { entry: e } = await addEntry(u.id, film.id);
+      await db.update(entry).set({ together: true, ...patch }).where(eq(entry.id, e.id));
+    }
+    expect(await friendsWanting(a.id, film.id)).toEqual(["Sara"]); // Omar hid it, Dana is not a friend
+    expect(await friendsWanting(a.id, "00000000-0000-4000-8000-000000000000")).toEqual([]);
+    expect(wantingHint([])).toBe("Open to doing this with friends");
+    expect(wantingHint(["Sara"])).toBe("Sara wants this too");
+    expect(wantingHint(["Sara", "Omar"])).toBe("Sara and Omar want this");
+    expect(wantingHint(["Sara", "Omar", "Lina"])).toBe("Sara, Omar and Lina want this");
+    expect(wantingHint(["Sara", "Omar", "Lina", "Khalid"])).toBe("Sara, Omar and 2 more want this");
+  });
+});

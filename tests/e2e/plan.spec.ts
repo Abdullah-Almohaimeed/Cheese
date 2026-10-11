@@ -134,7 +134,7 @@ test("the week strip moves between days and marks days that have plans", async (
   await page.goto(`/plan?day=${FUTURE}`);
   const day = Number(FUTURE.slice(8));
   await expect(page.locator(".ch-day.has-plan")).toHaveCount(1);
-  await expect(page.getByRole("link", { name: FUTURE_LABEL }).first()).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByRole("link", { name: FUTURE_LABEL }).first()).toHaveAttribute("aria-current", "page");
   await expect(page.getByText("Dune · 40 pages")).toBeVisible();
   const other = DateTime.fromISO(FUTURE, { zone: ZONE }).plus({ days: 1 });
   await page.getByRole("link", { name: other.toFormat("ccc d LLL") }).click();
