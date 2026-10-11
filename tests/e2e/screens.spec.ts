@@ -1,6 +1,7 @@
-import { test } from "@playwright/test";
+import { test, type Page } from "@playwright/test";
 import { mkdirSync } from "node:fs";
 import { resetDb } from "../helpers";
+import { seedDemo, userIdByName } from "../seed";
 import { signIn } from "./helpers";
 
 // Takes phone screenshots of each screen in light and dark. Only runs when SHOTS_DIR is set:
@@ -8,20 +9,36 @@ import { signIn } from "./helpers";
 const dir = process.env.SHOTS_DIR;
 test.skip(!dir, "set SHOTS_DIR to take screenshots");
 
+async function shot(page: Page, name: string, scheme: string, fullPage = false) {
+  await page.waitForLoadState("networkidle");
+  await page.screenshot({ path: `${dir}/${name}-${scheme}.png`, fullPage });
+}
+
 for (const scheme of ["light", "dark"] as const) {
   test.describe(scheme, () => {
     test.use({ colorScheme: scheme });
 
-    test("add", async ({ page }) => {
+    test("screens", async ({ page }) => {
       mkdirSync(dir!, { recursive: true });
       await resetDb();
       await signIn(page, "Yousef");
+      const me = await userIdByName("Yousef");
+      const seeded = await seedDemo(me);
+
       await page.goto("/add");
       await page.getByRole("searchbox", { name: "Search everything" }).fill("dune");
       await page.getByRole("button", { name: "Add Dune (Movie)" }).waitFor();
-      await page.getByRole("button", { name: "Add Dune (Movie)" }).click();
-      await page.getByRole("link", { name: "Open Dune" }).waitFor();
-      await page.screenshot({ path: `${dir}/add-${scheme}.png` });
+      await shot(page, "add", scheme);
+
+      await page.goto("/library");
+      await shot(page, "library", scheme);
+      await page.goto("/library?status=in_progress");
+      await shot(page, "library-progress", scheme);
+
+      await page.goto(`/item/${seeded["Frieren"].id}`);
+      await shot(page, "item", scheme, true);
+      await page.goto(`/item/${seeded["Spirited Away"].id}`);
+      await shot(page, "item-done", scheme, true);
     });
   });
 }

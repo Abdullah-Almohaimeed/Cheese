@@ -59,3 +59,20 @@ button.ch-btn, a.ch-btn { cursor: pointer; }
 .stat { font: 700 28px/32px var(--font-display); margin: 0; }
 
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* Links used as filter chips (server-rendered filters) behave like the pressed buttons in the design system */
+a.ch-chip { display: inline-flex; align-items: center; text-decoration: none; }
+.ch-chip[aria-current="true"] { background: var(--ink); color: var(--bg); }
+.ch-chip--quiet[aria-current="true"] { background: var(--surface-quiet); color: var(--ink); }
+.ch-chip[aria-current="true"] .muted { color: inherit; opacity: .7; }
+.ch-chip:disabled { opacity: .5; cursor: default; }
+
+/* Sort and filter menu */
+.menu { position: relative; }
+.menu > summary { list-style: none; cursor: pointer; font: 700 13px/16px var(--font-sans); color: var(--accent-text); padding: 10px 0 10px 12px; }
+.menu > summary::-webkit-details-marker { display: none; }
+.menu__panel { position: absolute; right: 0; top: 100%; z-index: 5; width: min(280px, calc(100vw - 32px)); border: 1px solid var(--line); }
+.menu__item { display: block; padding: 8px 0; text-decoration: none; font: 600 14px/20px var(--font-sans); }
+.menu__item[aria-current="true"] { font-weight: 800; }
+.menu__item[aria-current="true"]::after { content: " ✓"; }
+.ch-tile-grid a.ch-tile { color: inherit; }
