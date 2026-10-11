@@ -12,7 +12,7 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx scripts/migrate.ts",
     "db:local": "bash scripts/local-db.sh",
-    "dev:mock": "NODE_OPTIONS=\"--import ./scripts/mock-apis.mjs\" next dev",
+    "dev:mock": "cross-env TMDB_API_KEY=mock TWITCH_CLIENT_ID=mock TWITCH_CLIENT_SECRET=mock NODE_OPTIONS=\"--import ./scripts/mock-apis.mjs\" next dev",
     "test:e2e": "playwright test",
     "check": "tsc --noEmit && vitest run",
     "test:all": "vitest run && playwright test"
@@ -40,6 +40,7 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@types/web-push": "^3.6.4",
+    "cross-env": "^10.1.0",
     "drizzle-kit": "^0.31.11",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
