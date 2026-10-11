@@ -8,14 +8,16 @@ import { CATEGORIES, type Category } from "@/db/schema";
 import { loadGroupView } from "@/lib/common";
 import { listFriends, listGroups, listRequests } from "@/lib/friends";
 import { CATEGORY_PLURAL, formatMinutes, totalMinutes } from "@/lib/length";
+import { upcomingNights } from "@/lib/nights";
 import { requireUser } from "@/lib/session";
+import { dayLabel, timeLabel } from "@/lib/time";
 
 export const metadata = { title: "Friends" };
 
 type SP = { group?: string; category?: string; under?: string; platform?: string };
 
 export default async function FriendsPage({ searchParams }: { searchParams: Promise<SP> }) {
-  const { user } = await requireUser();
+  const { user, profile } = await requireUser();
   const sp = await searchParams;
   const [groups, friends, requests] = await Promise.all([listGroups(user.id), listFriends(user.id), listRequests(user.id)]);
 
@@ -23,7 +25,9 @@ export default async function FriendsPage({ searchParams }: { searchParams: Prom
   const category = CATEGORIES.includes(sp.category as Category) ? (sp.category as Category) : undefined;
   const under = sp.under === "120" ? 120 : undefined;
   const same = sp.platform === "same";
-  const view = selected ? await loadGroupView(user.id, selected.id, { category, underMinutes: under, samePlatform: same }) : null;
+  const [view, nights] = selected
+    ? await Promise.all([loadGroupView(user.id, selected.id, { category, underMinutes: under, samePlatform: same }), upcomingNights(selected.id)])
+    : [null, []];
 
   const href = (over: Partial<SP>) => {
     const p = new URLSearchParams();
@@ -127,6 +131,24 @@ export default async function FriendsPage({ searchParams }: { searchParams: Prom
                   </div>
                 </Link>
               </section>
+
+              {nights.length > 0 && (
+                <section className="sec">
+                  <p className="ch-overline">Coming up</p>
+                  <div className="ch-list ch-list--card">
+                    {nights.map(({ n, i, startsAt }) => (
+                      <Link key={n.id} className="ch-lrow" href={`/night/${n.id}`} style={{ gridTemplateColumns: "auto 1fr auto", textDecoration: "none", color: "inherit" }}>
+                        <Cover src={i.coverUrl} title={i.title} />
+                        <div className="ch-lrow__body">
+                          <p className="ch-row-title">{i.title}</p>
+                          <p className="ch-lrow__meta">{n.status === "set" && startsAt ? `${dayLabel(startsAt, profile.timezone)} · ${timeLabel(startsAt, profile.timezone)}` : "Voting on a time"}</p>
+                        </div>
+                        <span className="ch-count">{n.status === "set" ? "On" : "Vote"}</span>
+                      </Link>
+                    ))}
+                  </div>
+                </section>
+              )}
 
               <div className="ch-chips" role="group" aria-label="Filters">
                 <Link className="ch-chip ch-chip--quiet" href={href({ category: undefined })} aria-current={!category ? "true" : undefined}>

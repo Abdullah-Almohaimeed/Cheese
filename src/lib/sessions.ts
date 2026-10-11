@@ -32,7 +32,7 @@ export async function overlapping(userId: string, start: Date, end: Date, ignore
   return rows.filter((r) => r.id !== ignoreId);
 }
 
-export async function bookSession(userId: string, input: BookInput, now = new Date()): Promise<BookResult> {
+export async function bookSession(userId: string, input: BookInput, now = new Date(), opts: { allowOverlap?: boolean } = {}): Promise<BookResult> {
   const title = input.title.trim().slice(0, 160);
   if (!title) return { ok: false, error: "Give the session a title." };
   if (!Number.isInteger(input.durationMin) || input.durationMin < 5 || input.durationMin > 720) {
@@ -44,7 +44,7 @@ export async function bookSession(userId: string, input: BookInput, now = new Da
     const own = await db.query.entry.findFirst({ where: and(eq(entry.userId, userId), eq(entry.itemId, input.itemId)) });
     if (!own) return { ok: false, error: "That item is not in your library." };
   }
-  const clash = await overlapping(userId, input.startsAt, end);
+  const clash = opts.allowOverlap ? [] : await overlapping(userId, input.startsAt, end);
   if (clash.length) return { ok: false, error: `You already have “${clash[0].title}” at that time.` };
 
   const [session] = await db
@@ -68,18 +68,20 @@ export async function bookSession(userId: string, input: BookInput, now = new Da
 export async function completeSession(userId: string, id: string) {
   const s = await db.query.planSession.findFirst({ where: and(eq(planSession.id, id), eq(planSession.userId, userId)) });
   if (!s) return null;
-  if (s.done) return s;
+  if (s.done) return { session: s, entryId: null as string | null, finishedNow: false };
   // Claim the session first so a double tap cannot count it twice.
   const [claimed] = await db.update(planSession).set({ done: true }).where(and(eq(planSession.id, id), eq(planSession.done, false))).returning();
-  if (!claimed) return s;
+  if (!claimed) return { session: s, entryId: null as string | null, finishedNow: false };
 
   const own = s.itemId ? await db.query.entry.findFirst({ where: and(eq(entry.userId, userId), eq(entry.itemId, s.itemId)) }) : null;
+  let finishedNow = false;
   if (own && s.units) {
-    await changeProgress(userId, own.id, { add: s.units });
+    const res = await changeProgress(userId, own.id, { add: s.units });
+    finishedNow = res?.finishedNow ?? false;
   } else {
     await db.insert(progressLog).values({ userId, entryId: own?.id ?? null, deltaUnits: 0, minutes: s.durationMin });
   }
-  return claimed;
+  return { session: claimed, entryId: own?.id ?? null, finishedNow };
 }
 
 export async function removeSession(userId: string, id: string) {

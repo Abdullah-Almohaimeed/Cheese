@@ -52,9 +52,9 @@ export default async function SessionPage({ params }: { params: Promise<{ id: st
             </p>
           </form>
         )}
-        {i && (
-          <Link className="ch-btn ch-btn--ghost ch-btn--block" href="/library">
-            Open library
+        {s.nightId && (
+          <Link className="ch-btn ch-btn--ghost ch-btn--block" href={`/night/${s.nightId}`}>
+            Open the night with friends
           </Link>
         )}
         <form action={deleteSession.bind(null, s.id)}>

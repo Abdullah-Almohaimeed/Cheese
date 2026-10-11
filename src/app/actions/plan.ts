@@ -104,10 +104,11 @@ export async function bookFromForm(_prev: { error?: string } | undefined, formDa
 export async function markSessionDone(id: string) {
   const { user } = await requireUser();
   if (!z.uuid().safeParse(id).success) redirect("/plan");
-  await completeSession(user.id, id);
+  const res = await completeSession(user.id, id);
   revalidatePath("/plan");
   revalidatePath("/");
-  redirect("/plan");
+  // Finishing the last of something leads straight to rating it.
+  redirect(res?.finishedNow && res.entryId ? `/item/${res.entryId}?rate=1` : "/plan");
 }
 
 export async function deleteSession(id: string) {

@@ -100,6 +100,7 @@ CREATE TABLE "night" (
 	"item_id" uuid NOT NULL,
 	"status" "night_status" DEFAULT 'voting' NOT NULL,
 	"chosen_option_id" uuid,
+	"units" integer,
 	"public_token" text NOT NULL,
 	"note" text,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
@@ -251,6 +252,7 @@ ALTER TABLE "night_vote" ADD CONSTRAINT "night_vote_option_id_night_option_id_fk
 ALTER TABLE "night_vote" ADD CONSTRAINT "night_vote_participant_id_night_participant_id_fk" FOREIGN KEY ("participant_id") REFERENCES "public"."night_participant"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "plan_session" ADD CONSTRAINT "plan_session_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "plan_session" ADD CONSTRAINT "plan_session_item_id_item_id_fk" FOREIGN KEY ("item_id") REFERENCES "public"."item"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "plan_session" ADD CONSTRAINT "plan_session_night_id_night_id_fk" FOREIGN KEY ("night_id") REFERENCES "public"."night"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "profile" ADD CONSTRAINT "profile_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "progress_log" ADD CONSTRAINT "progress_log_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "progress_log" ADD CONSTRAINT "progress_log_entry_id_entry_id_fk" FOREIGN KEY ("entry_id") REFERENCES "public"."entry"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint

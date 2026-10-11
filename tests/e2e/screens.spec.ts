@@ -93,6 +93,28 @@ for (const scheme of ["light", "dark"] as const) {
       await page.goto("/settings");
       await shot(page, "settings", scheme);
 
+      // Nights: propose, collect some votes, then lock a time.
+      const { createNight, lockIn, nightForMember, toggleVote } = await import("@/lib/nights");
+      const inter = (await db.query.item.findFirst({ where: (t, { eq: e }) => e(t.externalId, "movie/157336") }))!;
+      await page.goto(`/night/new?group=${g.id}&item=${inter.id}`);
+      await shot(page, "night-new", scheme);
+      const t1 = new Date(`${DateTime.now().plus({ days: 4 }).toISODate()}T18:00:00Z`);
+      const t2 = new Date(`${DateTime.now().plus({ days: 5 }).toISODate()}T16:30:00Z`);
+      const t3 = new Date(`${DateTime.now().plus({ days: 6 }).toISODate()}T18:00:00Z`);
+      const made = await createNight(me, { groupId: g.id, itemId: inter.id, options: [t1, t2, t3].map((startsAt) => ({ startsAt, durationMin: 170 })) });
+      if (!made.ok) throw new Error(made.error);
+      const nv = (await nightForMember(me, made.id))!;
+      await toggleVote({ nightId: made.id, userId: friends[0].id }, nv.options[0].id);
+      await toggleVote({ nightId: made.id, userId: friends[1].id }, nv.options[0].id);
+      await toggleVote({ nightId: made.id, userId: friends[0].id }, nv.options[1].id);
+      await page.goto(`/night/${made.id}`);
+      await shot(page, "night-voting", scheme, true);
+      await page.goto(`/n/${nv.night.publicToken}`);
+      await shot(page, "night-public", scheme);
+      await lockIn(me, made.id, nv.options[0].id);
+      await page.goto(`/night/${made.id}`);
+      await shot(page, "night-set", scheme, true);
+
       await page.goto("/library");
       await shot(page, "library", scheme);
       await page.goto("/library?status=in_progress");

@@ -1,5 +1,5 @@
 {
-  "id": "f0c023dd-fbf0-4bd9-b35f-7fdcbb700008",
+  "id": "3918ab96-fd6c-434a-8be9-38da1fa68c49",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -874,6 +874,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "units": {
+          "name": "units",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
         "public_token": {
           "name": "public_token",
           "type": "text",
@@ -1372,6 +1378,19 @@
           "tableTo": "item",
           "columnsFrom": [
             "item_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "plan_session_night_id_night_id_fk": {
+          "name": "plan_session_night_id_night_id_fk",
+          "tableFrom": "plan_session",
+          "tableTo": "night",
+          "columnsFrom": [
+            "night_id"
           ],
           "columnsTo": [
             "id"

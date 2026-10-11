@@ -190,7 +190,7 @@ export const planSession = pgTable(
     durationMin: integer("duration_min").notNull(),
     // How many units (episodes, chapters, pages, minutes) this session is meant to cover.
     units: integer("units"),
-    nightId: uuid("night_id"),
+    nightId: uuid("night_id").references(() => night.id, { onDelete: "set null" }),
     note: text("note"),
     done: boolean("done").notNull().default(false),
     remindedAt: tz("reminded_at"),
@@ -251,6 +251,8 @@ export const night = pgTable(
     itemId: uuid("item_id").notNull().references(() => item.id, { onDelete: "cascade" }),
     status: nightStatusEnum("status").notNull().default("voting"),
     chosenOptionId: uuid("chosen_option_id"),
+    // Episodes, chapters or similar covered by the night. Applied to everyone's progress when they mark it done.
+    units: integer("units"),
     publicToken: text("public_token").notNull().unique(),
     note: text("note"),
     createdAt: tz("created_at").notNull().defaultNow(),
