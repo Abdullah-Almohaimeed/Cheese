@@ -16,7 +16,7 @@ async function shot(page: Page, name: string, scheme: string, fullPage = false) 
 
 for (const scheme of ["light", "dark"] as const) {
   test.describe(scheme, () => {
-    test.use({ colorScheme: scheme });
+    test.use({ colorScheme: scheme, timezoneId: "Asia/Riyadh" });
 
     test("screens", async ({ page }) => {
       mkdirSync(dir!, { recursive: true });
@@ -36,6 +36,23 @@ for (const scheme of ["light", "dark"] as const) {
       await shot(page, "fit", scheme);
       await page.goto("/pick?category=movie");
       await shot(page, "pick", scheme);
+
+      // Plan: usual evenings free, a booked session, and a gap to fill, three days ahead.
+      const { DateTime } = await import("luxon");
+      const { db } = await import("@/db");
+      const { freeWindow, planSession } = await import("@/db/schema");
+      const day = DateTime.now().plus({ days: 3 }).toISODate() as string;
+      await db.insert(freeWindow).values(Array.from({ length: 7 }, (_, weekday) => ({ userId: me, weekday, startMin: 19 * 60, endMin: 23 * 60 })));
+      await db.insert(planSession).values([
+        { userId: me, itemId: seeded["Frieren"].itemId, title: "Frieren · 2 episodes", category: "anime", startsAt: new Date(`${day}T16:30:00Z`), durationMin: 48, units: 2 },
+        { userId: me, itemId: seeded["Elden Ring"].itemId, title: "Elden Ring", category: "game", startsAt: new Date(`${day}T18:30:00Z`), durationMin: 90, units: 90 },
+      ]);
+      await page.goto(`/plan?day=${day}`);
+      await shot(page, "plan", scheme);
+      await page.goto("/plan/setup");
+      await shot(page, "plan-setup", scheme, true);
+      await page.goto(`/plan/book?day=${day}&start=19:00&gap=90`);
+      await shot(page, "plan-book", scheme);
 
       await page.goto("/library");
       await shot(page, "library", scheme);

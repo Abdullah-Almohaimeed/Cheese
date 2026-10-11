@@ -76,3 +76,15 @@ a.ch-chip { display: inline-flex; align-items: center; text-decoration: none; }
 .menu__item[aria-current="true"] { font-weight: 800; }
 .menu__item[aria-current="true"]::after { content: " ✓"; }
 .ch-tile-grid a.ch-tile { color: inherit; }
+
+/* Plan: week strip links and the adjust-this-day radios styled like the segmented control */
+a.ch-day { text-decoration: none; }
+.menu--block > summary { padding-left: 0; }
+.adjust-opt { display: flex; align-items: center; justify-content: center; min-height: 40px; border-radius: var(--radius-pill); font: 700 14px/20px var(--font-sans); color: var(--ink-muted); cursor: pointer; }
+input:checked + .adjust-opt { background: var(--ink); color: var(--bg); }
+input:focus-visible + .adjust-opt { outline: 2px solid var(--focus); outline-offset: 2px; }
+.week-day-card { display: flex; flex-direction: column; gap: var(--space-2); }
+.window-row { display: flex; align-items: center; gap: var(--space-2); }
+.window-row .input { min-height: 44px; min-width: 0; flex: 1; padding-inline: var(--space-2); font-size: 15px; }
+.window-row .iconbtn { flex: none; width: 40px; height: 40px; border: 0; font-size: 20px; line-height: 1; cursor: pointer; }
+.window-row > span { flex: none; }

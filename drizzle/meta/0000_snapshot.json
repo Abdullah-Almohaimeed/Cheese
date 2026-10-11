@@ -1,5 +1,5 @@
 {
-  "id": "be22aec8-3864-40c8-b1a1-dbe2fcf2a150",
+  "id": "f0c023dd-fbf0-4bd9-b35f-7fdcbb700008",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -1274,6 +1274,12 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": true
+        },
+        "units": {
+          "name": "units",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
         },
         "night_id": {
           "name": "night_id",

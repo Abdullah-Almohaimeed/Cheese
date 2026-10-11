@@ -188,6 +188,8 @@ export const planSession = pgTable(
     category: categoryEnum("category"),
     startsAt: tz("starts_at").notNull(),
     durationMin: integer("duration_min").notNull(),
+    // How many units (episodes, chapters, pages, minutes) this session is meant to cover.
+    units: integer("units"),
     nightId: uuid("night_id"),
     note: text("note"),
     done: boolean("done").notNull().default(false),

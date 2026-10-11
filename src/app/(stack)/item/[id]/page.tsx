@@ -7,7 +7,7 @@ import { Icon } from "@/components/icons";
 import { getOwnEntry } from "@/lib/entries";
 import { CATEGORY_LABEL, formatMinutes, totalMinutes } from "@/lib/length";
 import { requireUser } from "@/lib/session";
-import { ItemControls, type ItemState } from "./item-controls";
+import { ItemControls, RemoveButton, type ItemState } from "./item-controls";
 
 export const metadata = { title: "Item" };
 
@@ -95,6 +95,12 @@ export default async function ItemPage({ params, searchParams }: { params: Promi
       )}
 
       <ItemControls initial={state} />
+      <section>
+        <Link className="ch-btn ch-btn--primary ch-btn--block" href={`/plan/book?entry=${e.id}`}>
+          Book a time
+        </Link>
+      </section>
+      <RemoveButton entryId={e.id} />
     </>
   );
 }

@@ -202,7 +202,6 @@ export function ItemControls({ initial }: { initial: ItemState }) {
         </section>
       )}
 
-      <RemoveButton entryId={s.entryId} />
     </>
   );
 }
@@ -279,7 +278,7 @@ function ReviewBox({ value, onSave }: { value: string; onSave: (text: string) =>
   );
 }
 
-function RemoveButton({ entryId }: { entryId: string }) {
+export function RemoveButton({ entryId }: { entryId: string }) {
   const [confirming, setConfirming] = useState(false);
   const [pending, start] = useTransition();
   return (

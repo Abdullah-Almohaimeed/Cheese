@@ -139,6 +139,7 @@ CREATE TABLE "plan_session" (
 	"category" "category",
 	"starts_at" timestamp with time zone NOT NULL,
 	"duration_min" integer NOT NULL,
+	"units" integer,
 	"night_id" uuid,
 	"note" text,
 	"done" boolean DEFAULT false NOT NULL,
