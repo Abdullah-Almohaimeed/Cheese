@@ -41,6 +41,7 @@ export const overrideKindEnum = pgEnum("override_kind", ["add", "block"]);
 export const friendStatusEnum = pgEnum("friend_status", ["pending", "accepted"]);
 
 export type Category = (typeof CATEGORIES)[number];
+export type Source = (typeof SOURCES)[number];
 export type Status = (typeof STATUSES)[number];
 export type Priority = (typeof PRIORITIES)[number];
 export type Unit = (typeof UNITS)[number];
@@ -108,6 +109,8 @@ export const entry = pgTable(
     ratingHalf: smallint("rating_half"),
     review: text("review"),
     platform: text("platform"),
+    // Lets someone set the length themselves when the catalog does not know it.
+    totalOverride: integer("total_override"),
     wouldRedo: boolean("would_redo").notNull().default(false),
     startedAt: tz("started_at"),
     finishedAt: tz("finished_at"),

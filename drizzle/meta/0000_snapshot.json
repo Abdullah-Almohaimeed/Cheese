@@ -1,5 +1,5 @@
 {
-  "id": "ca452d77-cc3f-4fe3-b463-0c71949cf9ba",
+  "id": "b2f12293-609e-4e4b-bd73-916b970f86d6",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -79,6 +79,12 @@
         "platform": {
           "name": "platform",
           "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "total_override": {
+          "name": "total_override",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },

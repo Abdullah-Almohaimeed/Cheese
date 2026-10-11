@@ -19,6 +19,7 @@ CREATE TABLE "entry" (
 	"rating_half" smallint,
 	"review" text,
 	"platform" text,
+	"total_override" integer,
 	"would_redo" boolean DEFAULT false NOT NULL,
 	"started_at" timestamp with time zone,
 	"finished_at" timestamp with time zone,
