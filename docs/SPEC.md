@@ -130,6 +130,13 @@ Mockup: https://claude.ai/artifact/QszGgVZucNpYwwym9HMvmA
 - **Category colors**: anime pink, books amber, games purple, series blue (for tags and timeline blocks only).
 - **Type**: Unbounded for headings, Manrope for text.
 
+**Design system**: https://claude.ai/artifact/AWGS4UouMdYT66qZdUrhXT (tokens, components, all 7 screens). Where it differs from this spec, this spec wins:
+- Priority has **2 levels** (must do / someday), not the 3 shown on the Item detail screen.
+- Home also gets the **"I have __ min"** and **"Pick for me"** buttons.
+- Still to design, using the same components: usual free times setup, Google Calendar connect, the review step after finishing.
+
+Decisions taken from the design system: text on coral is dark (not white), spotlight text sits under the cover (never on it), the week starts on Sunday.
+
 ## 8. Lessons from the benchmark
 
 - Nobody combines all categories, time planning, friend overlap and scheduling. That combination is the point of Cheese.
