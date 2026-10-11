@@ -163,6 +163,15 @@ CREATE TABLE "profile" (
 	CONSTRAINT "profile_avatar_tone" CHECK ("profile"."avatar_tone" between 1 and 4)
 );
 --> statement-breakpoint
+CREATE TABLE "progress_log" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" text NOT NULL,
+	"entry_id" uuid,
+	"at" timestamp with time zone DEFAULT now() NOT NULL,
+	"delta_units" integer NOT NULL,
+	"minutes" integer NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "push_subscription" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"user_id" text NOT NULL,
@@ -242,6 +251,8 @@ ALTER TABLE "night_vote" ADD CONSTRAINT "night_vote_participant_id_night_partici
 ALTER TABLE "plan_session" ADD CONSTRAINT "plan_session_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "plan_session" ADD CONSTRAINT "plan_session_item_id_item_id_fk" FOREIGN KEY ("item_id") REFERENCES "public"."item"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "profile" ADD CONSTRAINT "profile_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "progress_log" ADD CONSTRAINT "progress_log_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "progress_log" ADD CONSTRAINT "progress_log_entry_id_entry_id_fk" FOREIGN KEY ("entry_id") REFERENCES "public"."entry"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "push_subscription" ADD CONSTRAINT "push_subscription_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "account" ADD CONSTRAINT "account_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "session" ADD CONSTRAINT "session_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -261,6 +272,7 @@ CREATE UNIQUE INDEX "night_participant_user_uq" ON "night_participant" USING btr
 CREATE INDEX "night_participant_night_idx" ON "night_participant" USING btree ("night_id");--> statement-breakpoint
 CREATE INDEX "plan_session_user_start_idx" ON "plan_session" USING btree ("user_id","starts_at");--> statement-breakpoint
 CREATE INDEX "plan_session_night_idx" ON "plan_session" USING btree ("night_id");--> statement-breakpoint
+CREATE INDEX "progress_log_user_at_idx" ON "progress_log" USING btree ("user_id","at");--> statement-breakpoint
 CREATE INDEX "push_subscription_user_idx" ON "push_subscription" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "account_userId_idx" ON "account" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "session_userId_idx" ON "session" USING btree ("user_id");--> statement-breakpoint

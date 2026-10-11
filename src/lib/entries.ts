@@ -1,6 +1,7 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, gte, lt, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { entry, item, type Priority, type Status } from "@/db/schema";
+import { entry, item, progressLog, type Priority, type Status } from "@/db/schema";
+import { unitSeconds } from "./length";
 import { withProgress, withStatus, type EntryState } from "./progress";
 
 /* ---------- Database operations. Every one is scoped to the signed-in user. ---------- */
@@ -25,8 +26,31 @@ export async function changeProgress(userId: string, entryId: string, mode: { ad
   const total = row.entry.totalOverride ?? row.item.totalUnits;
   const target = "add" in mode ? row.entry.progress + mode.add : mode.set;
   const next = withProgress(stateOf(row.entry), total, target);
-  const [updated] = await db.update(entry).set({ ...next, updatedAt: new Date() }).where(eq(entry.id, entryId)).returning();
+  const delta = next.progress - row.entry.progress;
+  // Tapping a progress button counts as time spent. Typing in a number ("set it") is only bookkeeping.
+  const countsAsTime = "add" in mode && delta !== 0;
+  const updated = await db.transaction(async (tx) => {
+    const [u] = await tx.update(entry).set({ ...next, updatedAt: new Date() }).where(eq(entry.id, entryId)).returning();
+    if (countsAsTime) {
+      await tx.insert(progressLog).values({
+        userId,
+        entryId,
+        deltaUnits: delta,
+        minutes: Math.round((delta * unitSeconds(row.item)) / 60),
+      });
+    }
+    return u;
+  });
   return { entry: updated, finishedNow: next.status === "done" && row.entry.status !== "done" };
+}
+
+/** Minutes of progress taps recorded between two moments. Never negative. */
+export async function minutesBetween(userId: string, from: Date, to: Date): Promise<number> {
+  const [r] = await db
+    .select({ n: sql<number>`coalesce(sum(${progressLog.minutes}), 0)::int` })
+    .from(progressLog)
+    .where(and(eq(progressLog.userId, userId), gte(progressLog.at, from), lt(progressLog.at, to)));
+  return Math.max(0, r?.n ?? 0);
 }
 
 export async function changeStatus(userId: string, entryId: string, status: Status) {

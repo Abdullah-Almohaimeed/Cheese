@@ -5,7 +5,7 @@ import { addEntry, upsertItem } from "@/lib/library";
 import type { ItemDraft } from "@/lib/providers/types";
 
 type Seed = {
-  draft: Omit<ItemDraft, "source" | "externalId" | "coverUrl" | "summary" | "genres" | "platforms" | "year"> & { genres?: string[]; platforms?: string[]; year?: number };
+  draft: Partial<ItemDraft> & Pick<ItemDraft, "category" | "title" | "unit" | "totalUnits" | "unitSeconds">;
   ext: string;
   patch?: Partial<typeof entry.$inferInsert>;
 };

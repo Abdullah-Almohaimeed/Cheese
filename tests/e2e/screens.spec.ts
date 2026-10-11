@@ -30,6 +30,13 @@ for (const scheme of ["light", "dark"] as const) {
       await page.getByRole("button", { name: "Add Dune (Movie)" }).waitFor();
       await shot(page, "add", scheme);
 
+      await page.goto("/");
+      await shot(page, "home", scheme);
+      await page.goto("/fit?minutes=90");
+      await shot(page, "fit", scheme);
+      await page.goto("/pick?category=movie");
+      await shot(page, "pick", scheme);
+
       await page.goto("/library");
       await shot(page, "library", scheme);
       await page.goto("/library?status=in_progress");

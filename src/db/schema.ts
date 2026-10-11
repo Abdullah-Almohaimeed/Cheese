@@ -127,6 +127,23 @@ export const entry = pgTable(
   ],
 );
 
+/* ---------- Time actually spent ---------- */
+
+// One row per tap of a progress button. Feeds the weekly goal now and streaks and recaps later.
+export const progressLog = pgTable(
+  "progress_log",
+  {
+    id: id(),
+    userId: userRef("user_id"),
+    entryId: uuid("entry_id").references(() => entry.id, { onDelete: "set null" }),
+    at: tz("at").notNull().defaultNow(),
+    deltaUnits: integer("delta_units").notNull(),
+    // Minutes this tap is worth. Negative when someone undoes a tap.
+    minutes: integer("minutes").notNull(),
+  },
+  (t) => [index("progress_log_user_at_idx").on(t.userId, t.at)],
+);
+
 /* ---------- Free time and sessions ---------- */
 
 export const freeWindow = pgTable(

@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { PRIORITIES, STATUSES, type Status } from "@/db/schema";
-import { changeProgress, changeStatus, patchEntry, removeEntry } from "@/lib/entries";
+import { changeProgress, changeStatus, getOwnEntry, patchEntry, removeEntry } from "@/lib/entries";
 import { requireUser } from "@/lib/session";
 
 const id = z.uuid();
@@ -77,4 +77,18 @@ export async function deleteEntry(entryId: string) {
   revalidatePath("/library");
   revalidatePath("/");
   redirect("/library");
+}
+
+/** Marks the item as started if it is not already, then opens it. */
+export async function startEntry(entryId: string) {
+  const { user } = await requireUser();
+  const parsedId = id.safeParse(entryId);
+  if (!parsedId.success) redirect("/");
+  const row = await getOwnEntry(user.id, parsedId.data);
+  if (!row) redirect("/");
+  if (row.entry.status === "want" || row.entry.status === "paused" || row.entry.status === "dropped") {
+    await changeStatus(user.id, parsedId.data, "in_progress");
+    refresh(entryId);
+  }
+  redirect(`/item/${entryId}`);
 }
